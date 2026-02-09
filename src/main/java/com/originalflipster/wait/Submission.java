@@ -7,67 +7,82 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 final class Submission {
-  private final String name;
-  private final LocalDateTime submission;
-  private final LocalDateTime deadline;
-  private final Duration maxDuration;
-  private final String result;
+    private final String name;
+    private final LocalDateTime submission;
+    private final LocalDateTime deadline;
+    private final Duration maxDuration;
+    private final Duration estimatedDuration;
+    private final String result;
+    private Mode mode = Mode.MAX;
 
-  Submission(String name, LocalDateTime submission, LocalDateTime deadline, Duration maxDuration, String result) {
-    this.name = name;
-    this.submission = submission;
-    this.deadline = deadline;
-    this.maxDuration = maxDuration;
-    this.result = result;
-  }
-
-  String getName() {
-    return name;
-  }
-
-  long days() {
-    return submission.until(LocalDateTime.now(), ChronoUnit.DAYS);
-  }
-
-  long hours() {
-    return submission.until(LocalDateTime.now(), ChronoUnit.HOURS);
-  }
-
-  long secs() {
-    return submission.until(LocalDateTime.now(), ChronoUnit.SECONDS);
-  }
-
-  BigDecimal progressDone() {
-    if(deadline != null) {
-      return BigDecimal.valueOf(((double) secs()) / ((double) maxDuration.toSeconds() + submission.until(deadline, ChronoUnit.SECONDS))).multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+    Submission(String name, LocalDateTime submission, LocalDateTime deadline, Duration maxDuration, Duration estimatedDuration, String result) {
+        this.name = name;
+        this.submission = submission;
+        this.deadline = deadline;
+        this.maxDuration = maxDuration;
+        this.estimatedDuration = estimatedDuration;
+        this.result = result;
     }
-    return BigDecimal.valueOf(((double) secs()) / ((double) maxDuration.toSeconds())).multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
-  }
 
-  private LocalDateTime start() {
-    if(deadline != null) {
-      return deadline;
+    String getName() {
+        return name;
     }
-    return submission;
-  }
 
-  private LocalDateTime end() {
-    return start().plus(maxDuration);
-  }
+    long days() {
+        return submission.until(LocalDateTime.now(), ChronoUnit.DAYS);
+    }
 
-  long daysLeft() {
-    return LocalDateTime.now().until(end(), ChronoUnit.DAYS);
-  }
+    long hours() {
+        return submission.until(LocalDateTime.now(), ChronoUnit.HOURS);
+    }
 
-  long hoursLeft() {
-    return LocalDateTime.now().until(end(), ChronoUnit.HOURS);
-  }
+    long secs() {
+        return submission.until(LocalDateTime.now(), ChronoUnit.SECONDS);
+    }
 
-  boolean done() {
-    return result != null;
-  }
+    BigDecimal progressDone() {
+        if (deadline != null) {
+            return BigDecimal.valueOf(((double) secs()) / ((double) activeDuration().toSeconds() + submission.until(deadline, ChronoUnit.SECONDS))).multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+        }
+        return BigDecimal.valueOf(((double) secs()) / ((double) activeDuration().toSeconds())).multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+    }
 
-  String getResult() {
-    return result;
-  }
+    private LocalDateTime start() {
+        if (deadline != null) {
+            return deadline;
+        }
+        return submission;
+    }
+
+    private LocalDateTime end() {
+        return start().plus(activeDuration());
+    }
+
+    long daysLeft() {
+        return LocalDateTime.now().until(end(), ChronoUnit.DAYS);
+    }
+
+    long hoursLeft() {
+        return LocalDateTime.now().until(end(), ChronoUnit.HOURS);
+    }
+
+    boolean done() {
+        return result != null;
+    }
+
+    String getResult() {
+        return result;
+    }
+
+    private boolean hasEstimate() {
+        return estimatedDuration != null;
+    }
+
+    void setMode(Mode mode) {
+        this.mode = mode;
+    }
+
+    private Duration activeDuration() {
+        return mode == Mode.ESTIMATE && hasEstimate() ? estimatedDuration : maxDuration;
+    }
 }
