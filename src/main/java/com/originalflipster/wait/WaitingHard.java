@@ -15,7 +15,7 @@ public class WaitingHard {
     public static void main(String[] args) throws InterruptedException, IOException {
         int offset = 2;
         var subs = List.of(
-                new Submission("EPCO final exam", LocalDateTime.parse("2026-01-27T17:45:00"), null, Duration.ofDays(28), Duration.ofDays(21), null),
+                new Submission("EPCO final exam", LocalDateTime.parse("2026-01-27T17:45:00"), null, Duration.ofDays(28), Duration.ofDays(21), "PASS"),
                 new Submission("BA Paper", LocalDateTime.parse("2026-01-18T23:45:00"), LocalDateTime.parse("2026-02-04T23:59:59"), Duration.ofDays(28), null, null),
                 new Submission("CJCA Pentesting Exam", LocalDateTime.parse("2026-01-25T16:17:00"), null, Duration.ofDays(28), null, "PASS"),
                 new Submission("TCF Francais", LocalDateTime.parse("2026-01-30T12:00:00"), null, Duration.ofDays(21), Duration.ofDays(14), null)
